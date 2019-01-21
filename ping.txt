@@ -1,0 +1,14 @@
+0# pong
+content ?
+1# je suis pas ton chien en fait
+2# c'est bien, t'as fait ta premiere commande de base
+3# k
+4# si tu me vois co je suis la, tkt pas
+5# c'est bon ? Fini de jouer ?
+6# nan mais tu sers a rien...
+7# "bonjour, je suis un utilisateur lambda, la seule chose que je sais faire c'est un ping mdr"
+8# vraiment, essaye d'autres commandes, je sers pas a grand chose la
+9# on applaudit tous la commande !ping
+10# RDV Gare du Nord
+11# Whololooooooooooo
+12# "Allez fous moi la paix"
