@@ -11,64 +11,59 @@ class MessageContent:
         self.msg_split = self.msg_trim.split(" ")
         while "" in self.msg_split:
             self.msg_split.remove("")
-        self.prefix = self.msg_split[0][0]
         self.cmd = ""
-        if len(self.msg_split[0]) > 1:
+        if len(self.msg_split[0]) > 1 and self.prefix == prefix:
             self.cmd = self.msg_split[0][1:]
-        self.parse_msg()
+        self.parse_msg(prefix)
 
-    def parse_msg(self):
-        #type : cmd "x", option "o", mention "m", word "w", quote "q", value "v"
-        #!ping "bonjour" -d -a 10 -moi "lol" 9
-        #!ping -"bon jour -10 " oui c'est moi"
-
-        print("got\n", self.msg_trim)
+    def parse_command(self, cmd):
+        if cmd in CMD_LIST:
+            self.parse_type.append("x")
+        else:
+            self.parse_type.append("w")
+        self.parse_msg.append(cmd)
+    
+    def parse_number(self, value, parse_type):
+        try:
+            res = int(value)
+            parse_type = "i"
+        except ValueError as e:
+            try:
+                res = float(value)
+                parse_type = "f"
+            except ValueError as e:
+                res = value
+        self.parse_type.append(parse_type)
+        self.parse_msg.append(value)
+    
+    def parse_mention(self, mention):
+        self.parse_type.append("m")
+        self.parse_msg.append(mention)
+    
+    def parse_msg(self, prefix):
+        #type : cmd "x", option "o", word "w", int "i", float "f", member "m", role = "r", "channel" = "c"
+        #!ping -d 9 -moi "lol" -10 @yoyoshi @aaaaa -1a !pong !omg
+        #[ping,x] , [d,o] , [9,i] , [moi,o] , ["lol",w] , [-10,i] , [yoyoshi, m] , [@aaaaa, w] , [1a,o] , [pong,x] , [!omg,w]
+        #x,i,f,m,r,c are only attributed if the value is correct. !omg is not a valid command therefor it will be considered as w
+        
         self.parse_type = []
         self.parse_msg = []
-        buffer = ""
-        type = None
-        if (self.msg_trim[0] == prefix):
-            type = "x"
-        i = 0
-        while i < len(self.msg_trim):
-            buffer = ""
-            if (self.msg_trim[i] == "\\"):
-                buffer += self.msg_trim[i+1]
-                i += 2
-                if (type == None):
-                    type = "w"
-            if (type == None and self.msg_trim[i] != " "):
-                #print("read =", self.msg_trim[i])
-                type = "w"
-                if (self.msg_trim[i] == "-"):
-                    type = "o"
-                if (self.msg_trim[i].isdigit() == True):
-                    type = "v"
-                if (self.msg_trim[i] == "<"):
-                    type = "m"
-                if (self.msg_trim[i] == "\"" or self.msg_trim[i] == "'"):
-                    save = self.msg_trim[i]
-                    type = "q"
-                    i += 1
-            if (type == "q"):
-                while i < len(self.msg_trim) and self.msg_trim[i] != save:
-                    if (self.msg_trim[i] == "\\"):
-                        buffer += self.msg_trim[i+1]
-                        i += 2
-                    else:
-                        buffer += self.msg_trim[i]
-                        i += 1
-            elif (type == "m"):
-                while i < len(self.msg_trim) and self.msg_trim[i] != ">":
-                    buffer += self.msg_trim[i]
-                    i += 1
-                if i < len(self.msg_trim):
-                    buffer += self.msg_trim[i]
+        for i in self.msg_split:
+            if i[0] in ["0123456789"]:
+                self.parse_number(i, "w")
+            elif len(i) == 1:
+                self.parse_type.append("w")
+                self.parse_msg.append(i)
+            elif i[0] == prefix:
+                self.parse_command(i[1:])
+            elif i[0] == "-":
+                self.parse_number(i[1:], "o"):
+            elif i[0] == "<":
+                self.parse_mention(i)
             else:
-                while i < len(self.msg_trim) and self.msg_trim[i] != " ":
-                    buffer += self.msg_trim[i]
-                    i += 1
-
+                self.parse_type.append("w")
+                self.parse_msg.append(i[(i[0] == "\\"):])
+    """
             if type == "m":
                 if len(buffer) >= 3:
                     if buffer[1] == "#" and buffer[2:-1] is in message.channel_mentions:
@@ -82,33 +77,13 @@ class MessageContent:
                 else:
                     type = "w"
 
-            if (type == "o"):
-                try:
-                    #print("buf =", buffer)
-                    test = int(buffer)
-                    type = "v"
-                except ValueError:
-                    if (len(buffer) == 1):
-                        type = "w"
-                        buffer = "-"
-                    else:
-                        buffer = buffer[1:]
-                        type = "o"
-            #if (buffer != ""):
-            if (type != None):
-                if (type == "q"):
-                    type = "w"
-                self.parse_type.append(type)
-                self.parse_msg.append(buffer)
-                type = None
-            i += 1
-
     def mention_is_inside(self, finder, list):
         for i in list:
             print("finder", finder, i.id)
             if finder == i.id:
                 return True
         return False
+    
 
     def find_parse(self, finder, order="first"): #find
         print(self.parse_type)
@@ -147,3 +122,37 @@ class MessageContent:
     #    for idx, i in enumerate(self.parse_type):
     #       if i in finder:
     #           res.append(self.parse_msg[idx])
+    """
+    
+    def finder(index=1, match="w", positive=True, reversed=False):
+        res = []
+        index_array = []
+        maxi = len(msg.parse_type)+1
+        if type(index) == type(0):
+            if index == 0:
+                index_array = [i for i in range(1, maxi)]
+            else:
+                index_array = [index]
+        else:
+            start = index[0]
+            end = (index[1] == 0) * maxi + (index[1] != 0) * index[1]
+            index_array = [i for i in range(start, end)]
+        
+        for idx, parse_type, parse_msg in enumerate(zip(msg.parse_type[::((-reversed)*2+1)], msg.parse_msg[::((-reversed)*2+1)])):
+            if (parse_type in match) == positive:
+                res.append(parse_msg)
+        return res
+    
+    def check(regex, specific=False):
+        
+    """
+    possible regex maker : finder(index=1, match="w", positive=true, reversed=False)
+    index is the answer you'll get when they respect the index. Index 0 is "all"
+    match will match all the given parse_type //to complete someday
+    if positive is false then it will match where regex is false
+    reversed start the research from the end
+    
+    check maker : check(regex, specific=False)
+    create a regex on the parse_type
+    specific == true means "must match all the parse_type"
+    """
