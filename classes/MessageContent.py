@@ -14,16 +14,18 @@ class MessageContent:
         self.cmd = ""
         if len(self.msg_split[0]) > 1 and self.prefix == prefix:
             self.cmd = self.msg_split[0][1:]
-        self.parse_msg(prefix)
+        self.parse_msg = []
+        self.parse_type = ""
+        self.parse(self.message, prefix)
 
     def parse_command(self, cmd):
         if cmd in CMD_LIST:
-            self.parse_type.append("x")
+            self.parse_type += "x"
         else:
-            self.parse_type.append("w")
+            self.parse_type += "w"
         self.parse_msg.append(cmd)
     
-    def parse_number(self, value, parse_type):
+    def parse_number(self, value, parse_type, offset=0):
         try:
             res = int(value)
             parse_type = "i"
@@ -32,37 +34,85 @@ class MessageContent:
                 res = float(value)
                 parse_type = "f"
             except ValueError as e:
-                res = value
-        self.parse_type.append(parse_type)
-        self.parse_msg.append(value)
+                res = value[offset:]
+        self.parse_type += parse_type
+        self.parse_msg.append(res)
     
     def parse_mention(self, mention):
-        self.parse_type.append("m")
+        self.parse_type += "m"
         self.parse_msg.append(mention)
     
-    def parse_msg(self, prefix):
-        #type : cmd "x", option "o", word "w", int "i", float "f", member "m", role = "r", "channel" = "c"
-        #!ping -d 9 -moi "lol" -10 @yoyoshi @aaaaa -1a !pong !omg
-        #[ping,x] , [d,o] , [9,i] , [moi,o] , ["lol",w] , [-10,i] , [yoyoshi, m] , [@aaaaa, w] , [1a,o] , [pong,x] , [!omg,w]
-        #x,i,f,m,r,c are only attributed if the value is correct. !omg is not a valid command therefor it will be considered as w
+    def parse(self, message, prefix):
+        """ return nothing but store data in self.parse_msg and self.parse_type
+        This function is used to parse the given message to help getting specific parts of it
         
-        self.parse_type = []
+        'element' is a single value from message.split(" ")
+        then for each elements we give a type that corresponds to its "function" in the message
+        type list : cmd "x", word "w", option "o", int "i", float "f", member "m", role = "r", "channel" = "c"
+        
+        exemple : !ping -d 9 -moi "lol" -10 @yoyoshi @aaaaa -1a !pong !omg
+        result : [ping,x] [d,o] [9,i] [moi,o] ["lol",w] [-10,i] [yoyoshi,m] [@aaaaa,w] [1a,o] [pong,x] [!omg,w]
+        result is [parse_msg, parse_type]
+        x,i,f,m,r,c are only attributed if the value is correct. w is used by default
+        
+        prefix just match the current prefix used on the server """
+        
+        @todo #make the parser works for mentions
+        
+        self.parse_type = ""
         self.parse_msg = []
-        for i in self.msg_split:
-            if i[0] in ["0123456789"]:
+        for i in message:
+            if i[0] in "0123456789":
                 self.parse_number(i, "w")
             elif len(i) == 1:
-                self.parse_type.append("w")
+                self.parse_type += "w"
                 self.parse_msg.append(i)
             elif i[0] == prefix:
                 self.parse_command(i[1:])
             elif i[0] == "-":
-                self.parse_number(i[1:], "o"):
+                self.parse_number(i, "o", 1)
             elif i[0] == "<":
                 self.parse_mention(i)
             else:
-                self.parse_type.append("w")
+                self.parse_type += "w"
                 self.parse_msg.append(i[(i[0] == "\\"):])
+   
+    def finder(self, target=None, match="wif", positive=True, reverse=False):
+        """ return elements in the message with given parameters
+        match is the type of elements you want to get (check the parse_type variable to see possibilities)
+        target will create the range of elements to capture
+            -None will match everything
+            -it follows the same syntax as an array indexer like [0:4]
+            -use ',' to add another target in the list
+            -exemple : 0:2,4 will match 0,1 and 4
+        positive match elements when they have the same value as positive
+        reverse on True will start the research from the end 
+        
+        by default the finder return all words """
+        
+        res = []
+        maxi = len(self.parse_type)
+        base = [i for i in range(0, maxi)]
+        index_array = []
+        
+        if target == None:
+            index_array = base
+        else:
+            for i in target.split(","):
+                if ":" not in i:
+                    index_array.append(int(i))
+                else:
+                    limits = i.split(":")
+                    for j in base[int(limits[0]):int(limits[1])]:
+                        index_array.append(j)
+        target = 0
+        for idx in base[::(-reverse)*2+1]:
+            if (self.parse_type[idx] in match) == positive:
+                if target in index_array:
+                    res.append(self.parse_msg[idx])
+                target += 1
+        return res
+
     """
             if type == "m":
                 if len(buffer) >= 3:
@@ -76,83 +126,4 @@ class MessageContent:
                         type = "w"
                 else:
                     type = "w"
-
-    def mention_is_inside(self, finder, list):
-        for i in list:
-            print("finder", finder, i.id)
-            if finder == i.id:
-                return True
-        return False
-    
-
-    def find_parse(self, finder, order="first"): #find
-        print(self.parse_type)
-        if (order != "first"):
-            finder = finder[::-1]
-        pos = -1
-        for i in finder:
-            pos += 1
-            while pos < len(self.parse_type):
-                if i == self.parse_type[pos]:
-                    print(self.parse_msg[pos])
-                    break
-                pos += 1
-        if pos == len(self.parse_type):
-            return None
-        return self.parse_msg[pos]
-
-    def find_all(self, finder): #find 
-        res = []
-        for index, i in enumerate(self.parse_type):
-            if i in finder:
-                res.append(self.parse_msg[index])
-        if len(res) == 0:
-            return None
-        return res
-
-    def find_is_exact(self, finder):
-        if len(finder) != len(self.parse_type):
-            return False
-        for idx, i in enumerate(finder):
-            if i != self.parse_type[idx]:
-                return False
-        return True
-    
-    #def find_all_next(self, finder):
-    #    for idx, i in enumerate(self.parse_type):
-    #       if i in finder:
-    #           res.append(self.parse_msg[idx])
-    """
-    
-    def finder(index=1, match="w", positive=True, reversed=False):
-        res = []
-        index_array = []
-        maxi = len(msg.parse_type)+1
-        if type(index) == type(0):
-            if index == 0:
-                index_array = [i for i in range(1, maxi)]
-            else:
-                index_array = [index]
-        else:
-            start = index[0]
-            end = (index[1] == 0) * maxi + (index[1] != 0) * index[1]
-            index_array = [i for i in range(start, end)]
-        
-        for idx, parse_type, parse_msg in enumerate(zip(msg.parse_type[::((-reversed)*2+1)], msg.parse_msg[::((-reversed)*2+1)])):
-            if (parse_type in match) == positive:
-                res.append(parse_msg)
-        return res
-    
-    def check(regex, specific=False):
-        
-    """
-    possible regex maker : finder(index=1, match="w", positive=true, reversed=False)
-    index is the answer you'll get when they respect the index. Index 0 is "all"
-    match will match all the given parse_type //to complete someday
-    if positive is false then it will match where regex is false
-    reversed start the research from the end
-    
-    check maker : check(regex, specific=False)
-    create a regex on the parse_type
-    specific == true means "must match all the parse_type"
     """
