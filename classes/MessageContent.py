@@ -126,4 +126,11 @@ class MessageContent:
                         type = "w"
                 else:
                     type = "w"
+                    
+    def mention_is_inside(self, finder, list):
+        for i in list:
+            print("finder", finder, i.id)
+            if finder == i.id:
+                return True
+        return False
     """
