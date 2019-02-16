@@ -1,5 +1,6 @@
 class BotSettings:
-    def __init__(self):
+    def __init__(self, prefix):
+        self.prefix = prefix
         self.state_rr = 0
         self.state_rr_true = 0
         self.rr_msg_left = 10

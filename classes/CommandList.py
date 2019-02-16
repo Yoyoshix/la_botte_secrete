@@ -1,6 +1,9 @@
 import numpy as np
 
 class CommandList:
+    def __init__(self):
+        self.cmd_list = ["ping", "pong", "help", "test", "update", "option", "rr", "we"] #incomplete
+
     def help(self, return_msg):
         return_msg.main = "```Here is all commands with desc and current state"
         return_msg.main += "\nping [-a|-d|-l]\nDesc : Dislay a random msg\nOptions : -a for adding a line. -d for delete a line. -l to get the current list\nState : Not working\n"
@@ -9,7 +12,7 @@ class CommandList:
         return_msg.main += "\nrr\nDesc : To start the russian roulette\nState : Coming\n"
         return_msg.main += "\nrrr\nDesc : To start the real russian roulette\nState : Coming\n"
         return_msg.main += "```"
-    
+
     def ping_write():
         pass
 
@@ -156,4 +159,13 @@ class CommandList:
     def debug_parse(self, msg, return_msg):
         return_msg.main = "msg is : `" + msg.message + "`\nParse gives (type, content) :\n"
         for i, j in zip(msg.parse_type, msg.parse_msg):
-            return_msg.main += i + ", " + j + "\n"
+            if type(j) == type(" "):
+                return_msg.main += i + ", " + j + "\n"
+            elif type(j) == type(0):
+                return_msg.main += i + ", " + str(j) + "\n"
+            else:
+                try:
+                    print("Special parse :", j, "\nType :", type(j))
+                    return_msg.main += i + ", " + j + "\n"
+                except ValueError as e:
+                    print("ERROR PARSING :", e)

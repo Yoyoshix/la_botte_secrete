@@ -1,8 +1,9 @@
-number = "1.1"
-res = ""
-try:
-    res = round(float(number) ** 2, 10)
-except ValueError as e:
-    print("error :", e)
-print(res)
-fdfds
+test = "hello"
+
+
+test = test.replace("h", '', 1)
+test = test.replace("e", '', 1)
+test = test.replace("l", '')
+test = test.replace("o", '', 1)
+
+print((test == ""))
