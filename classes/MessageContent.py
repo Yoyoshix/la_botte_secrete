@@ -1,4 +1,33 @@
+""" This part of the program integrates key informations contained in message.content
 
+The most important part here is the parser
+It answers to the problematic of good syntaxic commands that can be hard to manage.
+Questions such as "did the user send a value ?", "is there the -a option ?"
+
+So the idea is to segment each words (part of messages separated by a space)
+    and giving them a char about their property.
+There is currently 8 differents elements
+w : a word. Used by default
+x : a valid command. If the command does not exist it will be considered as a 'w'
+o : an option. When the user use a "-"
+i : an integer. Not that if a user enter "-10" it considers it as an integer and not an option
+f : a float.
+c : a valid channel.
+r : a valid role.
+m : a valid member.
+
+Once parsing is done it stores data into two variable, self.parse_type and self.parse_msg
+Then, you can use the checker() function that can helps you check if the current message
+    follows specific rules. It will also helps you manage errors and send a message to the user
+    depending of his use of the command
+You can also use the finder() function to get specific parts of the message that you
+    consider important and then process them easily
+
+Note : On the discord.py documentation it says that mentions contained in the message
+    that you can access with message.xxx_mentions are not necessary in the order in
+    which they appear. This parser promises that the order will be correct.
+    You can know create some commands like !hug @someone from @admin
+"""
 
 class MessageContent:
     def __init__(self, message, prefix, cmd_list):
@@ -32,6 +61,7 @@ class MessageContent:
             self.parse_type += "w"
             self.parse_msg.append(cmd)
 
+    #parse the option at the same time
     def parse_number(self, value, parse_type, offset=0):
         try:
             res = int(value)
@@ -69,11 +99,6 @@ class MessageContent:
 
     def parse(self, message, prefix, cmd_list):
         """ return nothing but store data in self.parse_msg and self.parse_type
-        This function is used to parse the given message to help getting specific parts of it
-
-        'element' is a single value from message.split(" ")
-        then for each elements we give a type that corresponds to its "function" in the message
-        type list : cmd "x", word "w", option "o", int "i", float "f", member "m", role = "r", "channel" = "c"
 
         exemple : !ping -d 9 -moi "lol" -10 @yoyoshi @aaaaa -1a !pong !omg
         result : [ping,x] [d,o] [9,i] [moi,o] ["lol",w] [-10,i] [yoyoshi,m] [@aaaaa,w] [1a,o] [pong,x] [!omg,w]
@@ -121,13 +146,13 @@ class MessageContent:
     def finder(self, match="w", ranges=None, positive=True, reverse=False):
         """ return elements in the message with given parameters
         match is the type of elements you want to get (check the parse_type variable to see possibilities)
-        target will create the range of elements to capture
-            -None will match everything
+        ranges will create the range of elements to capture
+            -None will check everything
             -it follows the same syntax as an array indexer like [0:4]
             -use ',' to add another target in the list
             -exemple : 0:2,4 will match 0,1 and 4
         positive match elements when they have the same value as positive
-        reverse on True will start the research from the end
+        reverse on True will reverse the order of the research
 
         by default the finder return all words """
 
@@ -143,17 +168,15 @@ class MessageContent:
                 target += 1
         return res
 
-    def checker(self, match="xw", ranges=None, in_a_row=True, reverse=False):
+    def checker(self, match="xw", ranges="0,1", in_a_row=True, reverse=False):
         """ return True if parameters does match the parse_type
-        match is the content of the parse_type elements you want to search
+        match is the content of the parse_type elements you want to search. Note that you can write www to check 3 words in a row
         in_a_row on True means that match must be a substring of parse_type.
             - Using False will check if elements in match does appear in parse_type with the order
             - Using None will just check if elements are in parse_type whatever the order is
-        limits is just when to start, when to end
-            - Putting negatives values here will start from the end
-        reverse on True will reverse the order of the checker
+        ranges and reverse are the same as above
 
-        by default it returns True if there is a command and a word """
+        by default it returns True if there is a command followed by a word """
 
         res = []
         length = len(self.parse_type)
