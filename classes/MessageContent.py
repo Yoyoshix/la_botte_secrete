@@ -2,7 +2,7 @@
 
 The most important part here is the parser
 It answers to the problematic of good syntaxic commands that can be hard to manage.
-Questions such as "did the user send a value ?", "is there the -a option ?"
+    Questions such as "did the user send a value ?", "is there the -a option ?"
 
 So the idea is to segment each words (part of messages separated by a space)
     and giving them a char about their property.
@@ -10,7 +10,7 @@ There is currently 8 differents elements
 w : a word. Used by default
 x : a valid command. If the command does not exist it will be considered as a 'w'
 o : an option. When the user use a "-"
-i : an integer. Not that if a user enter "-10" it considers it as an integer and not an option
+i : an integer. Note that "-10" is considered as an integer, not an option
 f : a float.
 c : a valid channel.
 r : a valid role.
@@ -107,8 +107,6 @@ class MessageContent:
 
         prefix just match the current prefix used on the server """
 
-        #@todo #make the parser works for mentions
-
         self.parse_type = ""
         self.parse_msg = []
         for i in message:
@@ -161,7 +159,7 @@ class MessageContent:
         index_array = self.indexes(ranges)
 
         target = 0
-        for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1):
+        for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
             if (self.parse_type[idx] in match) == positive:
                 if target in index_array:
                     res.append(self.parse_msg[idx])
@@ -183,7 +181,7 @@ class MessageContent:
         index_array = self.indexes(ranges)
         substring = ""
 
-        for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1):
+        for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
             if idx in index_array:
                 substring += self.parse_type[idx]
 
