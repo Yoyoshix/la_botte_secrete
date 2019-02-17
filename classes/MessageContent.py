@@ -5,7 +5,7 @@ It answers to the problematic of good syntaxic commands that can be hard to mana
     Questions such as "did the user send a value ?", "is there the -a option ?"
 
 So the idea is to segment each words (part of messages separated by a space)
-    and giving them a char about their property.
+    and giving them a code (by a unique char) about their property.
 There is currently 8 differents elements
 w : a word. Used by default
 x : a valid command. If the command does not exist it will be considered as a 'w'
@@ -17,9 +17,9 @@ r : a valid role.
 m : a valid member.
 
 Once parsing is done it stores data into two variable, self.parse_type and self.parse_msg
-Then, you can use the checker() function that can helps you check if the current message
-    follows specific rules. It will also helps you manage errors and send a message to the user
-    depending of his use of the command
+Then, you can use the checker() function which helps you check if the current message
+    follows specific rules. It will also helps you manage errors on your side
+    when user enters a bad syntaxic comand
 You can also use the finder() function to get specific parts of the message that you
     consider important and then process them easily
 
@@ -125,7 +125,7 @@ class MessageContent:
                 self.parse_type += "w"
                 self.parse_msg.append(i[(i[0] == "\\"):])
 
-    def indexes(self, ranges):
+    def indexes(self, ranges, offset=0):
         length = len(self.parse_type)
         index_array = []
 
@@ -134,21 +134,21 @@ class MessageContent:
         else:
             for i in ranges.split(","):
                 if ":" not in i:
-                    index_array.append(int(i))
+                    index_array.append(int(i)-offset)
                 else:
                     limits = i.split(":")
-                    for j in range(int(limits[0]),int(limits[1])):
-                        index_array.append(j)
+                    for j in range(int(limits[0]),int(limits[1])+offset):
+                        index_array.append(j-offset)
         return index_array
 
-    def finder(self, match="w", ranges=None, positive=True, reverse=False):
+    def finder(self, match="w", occurences=None, positive=True, reverse=False):
         """ return elements in the message with given parameters
         match is the type of elements you want to get (check the parse_type variable to see possibilities)
-        ranges will create the range of elements to capture
-            -None will check everything
+        occurences will create the nth indexes elements to capture
+            -None will find everything
             -it follows the same syntax as an array indexer like [0:4]
             -use ',' to add another target in the list
-            -exemple : 0:2,4 will match 0,1 and 4
+            -exemple : 1:3,5 will match the first, second, third and fifth occurence
         positive match elements when they have the same value as positive
         reverse on True will reverse the order of the research
 
@@ -156,7 +156,7 @@ class MessageContent:
 
         res = []
         length = len(self.parse_type)
-        index_array = self.indexes(ranges)
+        index_array = self.indexes(ranges, 1)
 
         target = 0
         for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
@@ -198,3 +198,15 @@ class MessageContent:
                     match = match.replace(i, '', 1)
             return (match == "")
         return None
+
+""" Exemples :
+You want to check if the command does have a number and get it.
+You also want the command to respect this syntax : xwi
+use checker like this : checker("xwi", "0:2")
+if it returns True you can then call the finder
+like this : finder("i", 1)
+we know the message does have a number, finder will return the only integer
+you can also use directly MessageContent.parse_msg[2] because you are sure
+the number is at index 2
+
+"""

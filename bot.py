@@ -1,5 +1,4 @@
 import discord
-import json
 import os
 import random
 
@@ -79,10 +78,9 @@ async def on_ready():
     print("logged in as", client.user.name, client.user.id)
     await client.change_presence(game=discord.Game(name="Tourner Laurent en Bourique", type=0))
 
-with open("auth.json") as f:
-    jsnf = json.load(f)
-    #print(jsnf['token'])
-client.run(jsnf['token'])
+client.run(os.environ["TOKEN"])
+
+#client.run(os.environ["TOKEN"])
 
 #@todo creer la cmd !joke
 #@todo faire un truc de mathplotlib, save le graphic, importer le graphic sur discord

@@ -1,9 +1,9 @@
-test = "hello"
+def test(line, reverse):
+    length = len(line)
+    for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1):
+        print(line[idx])
 
-
-test = test.replace("h", '', 1)
-test = test.replace("e", '', 1)
-test = test.replace("l", '')
-test = test.replace("o", '', 1)
-
-print((test == ""))
+input = "abcdef"
+test(input, False)
+print("---")
+test(input, True)
