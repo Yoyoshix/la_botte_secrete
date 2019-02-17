@@ -46,8 +46,6 @@ async def on_message(message):
             await exe.mute_or_unmute(discord, msg, client, serv, return_msg)
         if msg.cmd == "rr" or msg.cmd == "trr":
             exe.option(msg, return_msg)
-        if msg.cmd == "luis":
-            luis.add_user(msg, return_msg)
         if msg.cmd == "servstate":
             serv.get_state(return_msg)
         if msg.cmd == "plot":
@@ -74,7 +72,6 @@ async def on_message(message):
     #    return_msg = group.group(bot, msg_split)
         #return_msg = count
         #return_msg = group.group(bot, message, msg_split)
-
 
 @client.event
 async def on_ready():

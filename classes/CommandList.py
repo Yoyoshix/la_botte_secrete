@@ -156,16 +156,36 @@ class CommandList:
         print("k")
         return_msg.main = msg.parse_msg[msg.parse_type.index('w')]
 
+    def get_type_name(self, type):
+        if type == "x":
+            return "command"
+        if type == "w":
+            return "word"
+        if type == "o":
+            return "option"
+        if type == "i":
+            return "int"
+        if type == "f":
+            return "float"
+        if type == "m":
+            return "member"
+        if type == "r":
+            return "role"
+        if type == "c":
+            return "channel"
+
     def debug_parse(self, msg, return_msg):
         return_msg.main = "msg is : `" + msg.message + "`\nParse gives (type, content) :\n"
         for i, j in zip(msg.parse_type, msg.parse_msg):
             if type(j) == type(" "):
-                return_msg.main += i + ", " + j + "\n"
+                return_msg.main += self.get_type_name(i) + ", " + j + "\n"
             elif type(j) == type(0):
-                return_msg.main += i + ", " + str(j) + "\n"
+                return_msg.main += self.get_type_name(i) + ", " + str(j) + "\n"
+            elif type(j) == type(.0):
+                return_msg.main += self.get_type_name(i) + ", " + str(j) + "\n"
             else:
                 try:
                     print("Special parse :", j, "\nType :", type(j))
-                    return_msg.main += i + ", " + j + "\n"
+                    return_msg.main += self.get_type_name(i) + ", " + j + "\n"
                 except ValueError as e:
                     print("ERROR PARSING :", e)

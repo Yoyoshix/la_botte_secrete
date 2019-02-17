@@ -27,9 +27,10 @@ class MessageContent:
     def parse_command(self, cmd, cmd_list):
         if cmd in cmd_list:
             self.parse_type += "x"
+            self.parse_msg.append(cmd[1:])
         else:
             self.parse_type += "w"
-        self.parse_msg.append(cmd)
+            self.parse_msg.append(cmd)
 
     def parse_number(self, value, parse_type, offset=0):
         try:
@@ -57,10 +58,13 @@ class MessageContent:
             self.parse_type += "m"
         elif self.is_mention_inside(mention[3:-1], self.role_mentions) == True:
             self.parse_type += "r"
-        elif self.is_mention_inside(mention[3:-1], self.channel_mentions) == True:
+        elif self.is_mention_inside(mention[2:-1], self.channel_mentions) == True:
             self.parse_type += "c"
         else:
             self.parse_type += "w"
+            print("LOG LOG LOG")
+            with open("log.txt", "w") as f:
+                f.write(mention)
         self.parse_msg.append(mention)
 
     def parse(self, message, prefix, cmd_list):
@@ -89,7 +93,7 @@ class MessageContent:
                 self.parse_type += "w"
                 self.parse_msg.append(i)
             elif i[0] == prefix:
-                self.parse_command(i[1:], cmd_list)
+                self.parse_command(i, cmd_list)
             elif i[0] == "-":
                 self.parse_number(i, "o", 1)
             elif i[0] == "<" and len(i) > 3:
