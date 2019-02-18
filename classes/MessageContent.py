@@ -166,7 +166,7 @@ class MessageContent:
                 target += 1
         return res
 
-    def checker(self, match="xw", ranges="0,1", in_a_row=True, reverse=False):
+    def checker(self, match="xw", ranges=None, in_a_row=True, reverse=False):
         """ return True if parameters does match the parse_type
         match is the content of the parse_type elements you want to search. Note that you can write www to check 3 words in a row
         in_a_row on True means that match must be a substring of parse_type.

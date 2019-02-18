@@ -1,9 +1,13 @@
-def test(line, reverse):
-    length = len(line)
-    for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1):
-        print(line[idx])
+from modulefinder import ModuleFinder
+f = ModuleFinder()
 
-input = "abcdef"
-test(input, False)
-print("---")
-test(input, True)
+# Run the main script
+f.run_script('bot.py')
+
+# Get names of all the imported modules
+names = list(f.modules.keys())
+
+# Get a sorted list of the root modules imported
+basemods = sorted(set([name.split('.')[0] for name in names]))
+# Print it nicely
+print("\n".join(basemods))
