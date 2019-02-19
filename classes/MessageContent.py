@@ -41,7 +41,7 @@ class MessageContent:
         self.member_mentions = message.mentions
         self.role_mentions = message.role_mentions
         self.channel_mentions = message.channel_mentions
-        
+
         self.msg_trim = self.message.strip()
         self.msg_split = self.msg_trim.split(" ")
         while "" in self.msg_split:
@@ -146,7 +146,7 @@ class MessageContent:
                         index_array.append(j-offset)
         return index_array
 
-        def finder(self, match="w", occurences=None, start=None, stop=None, trigger=True, positive=True, reverse=False):
+    def finder(self, match="w", occurences=None, start=None, stop=None, trigger=True, positive=True, reverse=False):
         """ return elements in the message with given parameters
         match is the type of elements you want to get (check the parse_type variable to see possibilities)
         occurences will create the nth indexes elements to capture
@@ -166,7 +166,7 @@ class MessageContent:
         reverse on True will reverse the order of the research
 
         by default the finder return all words """
-        
+
         res = []
         length = len(self.parse_type)
         index_array = self.indexes(occurences, 1)
@@ -174,7 +174,7 @@ class MessageContent:
         target = 0
         if match == None:
             match = "xwoifmrcs"
-        
+
         for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
             if is_capturing == False:
                 if type(start) == type(0):
