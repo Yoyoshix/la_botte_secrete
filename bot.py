@@ -78,9 +78,7 @@ async def on_ready():
     print("logged in as", client.user.name, client.user.id)
     await client.change_presence(game=discord.Game(name="Tourner Laurent en Bourique", type=0))
 
-client.run(os.environ["TOKEN"])
-
-#client.run(os.environ["TOKEN"])
+client.run("NDQ2MzgyMTY0MDQ1NTk0NjI0.D01_-g.XyHuKaRJRurl1kd0gNYSvXOpcEI")
 
 #@todo creer la cmd !joke
 #@todo faire un truc de mathplotlib, save le graphic, importer le graphic sur discord

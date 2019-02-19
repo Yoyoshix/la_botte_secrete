@@ -1,5 +1,4 @@
-0# pong
-content ?
+0# pong\ncontent ?
 1# je suis pas ton chien en fait
 2# c'est bien, t'as fait ta premiere commande de base
 3# k

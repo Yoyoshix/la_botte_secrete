@@ -15,6 +15,8 @@ f : a float.
 c : a valid channel.
 r : a valid role.
 m : a valid member.
+s : special. Currently, only @everyone and @here are registered here.
+    This last category is useful to avoid capturing them with finder("w")
 
 Once parsing is done it stores data into two variable, self.parse_type and self.parse_msg
 Then, you can use the checker() function which helps you check if the current message
@@ -36,6 +38,10 @@ class MessageContent:
         self.server = message.server
         self.channel = message.channel
 
+        self.member_mentions = message.mentions
+        self.role_mentions = message.role_mentions
+        self.channel_mentions = message.channel_mentions
+        
         self.msg_trim = self.message.strip()
         self.msg_split = self.msg_trim.split(" ")
         while "" in self.msg_split:
@@ -44,10 +50,6 @@ class MessageContent:
         self.cmd = ""
         if len(self.msg_split[0]) > 1 and self.msg_split[0][0] == prefix:
             self.cmd = self.msg_split[0][1:]
-
-        self.member_mentions = message.mentions
-        self.role_mentions = message.role_mentions
-        self.channel_mentions = message.channel_mentions
 
         self.parse_msg = []
         self.parse_type = ""
@@ -115,6 +117,9 @@ class MessageContent:
             elif len(i) == 1:
                 self.parse_type += "w"
                 self.parse_msg.append(i)
+            elif i == "@everyone" or i == "@here":
+                self.parse_type += "s"
+                self.parse_msg.append(i)
             elif i[0] == prefix:
                 self.parse_command(i, cmd_list)
             elif i[0] == "-":
@@ -141,29 +146,52 @@ class MessageContent:
                         index_array.append(j-offset)
         return index_array
 
-    def finder(self, match="w", occurences=None, positive=True, reverse=False):
+        def finder(self, match="w", occurences=None, start=None, stop=None, trigger=True, positive=True, reverse=False):
         """ return elements in the message with given parameters
         match is the type of elements you want to get (check the parse_type variable to see possibilities)
         occurences will create the nth indexes elements to capture
             -None will find everything
-            -it follows the same syntax as an array indexer like [0:4]
-            -use ',' to add another target in the list
+            -use ':' to make a range of capture, be careful as it is inclusive
+            -use ',' to add another capture in the list
             -exemple : 1:3,5 will match the first, second, third and fifth occurence
+        start and stop will respectively start and stop the finder on the first occurence of one of their parse_type
+            you can give them a number as an index OR gives them a range of parse_type
+            None will not trigger them
+            stop is exclusive. It means that if start=stop nothing will be returned
+        trigger on False will check stop only once start has been triggered. True will not
+            You might get an unexpected result if start=2, stop=1, Trigger=False
+                Like this, stop will not be evaluated and the finder will check elements[2:]
+            Very useful when you want to start on a specific index and end on a specific parse_type after the index
         positive match elements when they have the same value as positive
         reverse on True will reverse the order of the research
 
         by default the finder return all words """
-
+        
         res = []
         length = len(self.parse_type)
-        index_array = self.indexes(ranges, 1)
-
+        index_array = self.indexes(occurences, 1)
+        is_capturing = (start == None)
         target = 0
+        if match == None:
+            match = "xwoifmrcs"
+        
         for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
-            if (self.parse_type[idx] in match) == positive:
-                if target in index_array:
-                    res.append(self.parse_msg[idx])
-                target += 1
+            if is_capturing == False:
+                if type(start) == type(0):
+                    is_capturing = (idx == start)
+                else:
+                    is_capturing = (self.parse_type[idx] in start)
+            if stop != None:
+                if trigger == True or is_capturing == True:
+                    if type(stop) == type(0) and (idx == stop):
+                        return res
+                    if type(stop) == " " and (self.parse_type[idx] in stop):
+                        return res
+            if is_capturing == True:
+                if (self.parse_type[idx] in match) == positive:
+                    if target in index_array:
+                        res.append(self.parse_msg[idx])
+                    target += 1
         return res
 
     def checker(self, match="xw", ranges=None, in_a_row=True, reverse=False):

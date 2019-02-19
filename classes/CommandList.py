@@ -6,7 +6,7 @@ class CommandList:
 
     def help(self, return_msg):
         return_msg.main = "```Here is all commands with desc and current state"
-        return_msg.main += "\nping [-a|-d|-l]\nDesc : Dislay a random msg\nOptions : -a for adding a line. -d for delete a line. -l to get the current list\nState : Not working\n"
+        return_msg.main += "\nping [-a|-d|-l]\nDesc : Dislay a random msg\nOptions : -a to add a line. -d to delete a line. -l to get the current list\nState : Not working\n"
         return_msg.main += "\npong\nDesc : lol\n"
         return_msg.main += "\nsay\nDesc : If you want the bot say something\nState : Some issues with whole msg\n"
         return_msg.main += "\nrr\nDesc : To start the russian roulette\nState : Coming\n"

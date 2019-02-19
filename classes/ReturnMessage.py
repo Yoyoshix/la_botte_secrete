@@ -1,11 +1,12 @@
 class ReturnMessage:
     def __init__(self, main="", error="", warning="", priority="", info="", got_cmd=False):
-        self.main = main
-        self.error = error
-        self.warning = warning
-        self.priority = priority
-        self.info = info
-        self.got_cmd = got_cmd
+        self.error = error         #msg that will be highlighted with ``` + with some colors
+        self.warning = warning     #msg that will be highlighted with `
+        self.priority = priority   #msg that will be printed before main
+        self.main = main           #msg that will be printed normally
+        self.info = info           #msg that will be printed in italic in last
+        self.target = None         #id of channel to send this message, can be private. If None, send the message to message.channel
+        #self.got_cmd = got_cmd     #wtf ???
 
     def make_answer(self):
         answer = ""
