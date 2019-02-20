@@ -14,7 +14,7 @@ class PingDatabase:
     def load_ping_text(self):
         res = []
         while self.waiting == True:
-            pass
+            print("waiting")
         self.waiting = True
         with open(self.FILE_PATH, "r") as file:
             for i in file:
@@ -24,9 +24,12 @@ class PingDatabase:
         print("PING loaded")
         return res
 
-    def save_ping_text(self):
+"""
+    def save_ping_text(self, test):
+        print("wtf ???", test)
         while self.waiting == True:
-            pass
+            print("waiting")
+        print("wtf mon ptit chat")
         self.waiting = True
         with open(self.FILE_PATH, "w") as file:
             for idx, i in enumerate(self.pingdtb):
@@ -34,3 +37,4 @@ class PingDatabase:
         self.waiting = False
         print("PING saved")
         pass
+"""

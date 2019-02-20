@@ -1,3 +1,2 @@
-while 1 == 1:
-    pass
-print("?")
+test = None
+print(test == None)

@@ -1,10 +1,10 @@
 class ReturnMessage:
     def __init__(self):
-        self.error = error         #msg that will be highlighted with ``` + with some colors
-        self.warning = warning     #msg that will be highlighted with `
-        self.priority = priority   #msg that will be printed before main
-        self.main = main           #msg that will be printed normally
-        self.info = info           #msg that will be printed in italic in last
+        self.error = ""         #msg that will be highlighted with ``` + with some colors
+        self.warning = ""     #msg that will be highlighted with `
+        self.priority = ""   #msg that will be printed before main
+        self.main = ""           #msg that will be printed normally
+        self.info = ""           #msg that will be printed in italic in last
         self.channel = None         #id of channel to send this message, can be private. If None, send the message to message.channel
         #self.got_cmd = got_cmd     #wtf ???
 
@@ -18,7 +18,6 @@ class ReturnMessage:
         if (self.priority != ""):
             answer += self.priority + "\n"
         if self.main != "" and self.main != []:
-            print(type(self.main), type([]), self.main)
             if type(self.main) == type([]):
                 print("inside")
                 self.main = ", ".join(self.main)

@@ -56,7 +56,7 @@ class MessageContent:
         self.parse(self.msg_split, prefix, cmd_list)
 
     def parse_command(self, cmd, cmd_list):
-        if cmd in cmd_list:
+        if cmd[1:] in cmd_list:
             self.parse_type += "x"
         else:
             self.parse_type += "w"
@@ -133,7 +133,7 @@ class MessageContent:
         length = len(self.parse_type)
         index_array = []
 
-        if ranges == None:
+        if ranges is None:
             index_array = [i for i in range(length)]
         else:
             for i in ranges.split(","):
@@ -169,13 +169,15 @@ class MessageContent:
 
         res = []
         length = len(self.parse_type)
+        if occurences != None:
+            occurences = str(occurences)
         index_array = self.indexes(occurences, 1)
         is_capturing = (start == None)
         target = 0
         if match == None:
             match = "xwoifmrcs"
         if len(match) > 0 and match[0] == "!":
-            positive = !positive
+            positive = (positive == False)
 
         for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
             if is_capturing == False:
@@ -192,9 +194,7 @@ class MessageContent:
             if is_capturing == True:
                 if (self.parse_type[idx] in match) == positive:
                     if target in index_array:
-                        if keep_prefix == False:
-                            res.append(self.parse_msg[idx][(self.parse_type[idx] in "ox"):])
-                        res.append(self.parse_msg[idx])
+                        res.append(self.parse_msg[idx][(keep_prefix == False and self.parse_type[idx] in "ox"):])
                     target += 1
         if len(res) == 0:
             return None
@@ -215,6 +215,8 @@ class MessageContent:
 
         res = []
         length = len(self.parse_type)
+        if ranges != None:
+            ranges = str(ranges)
         index_array = self.indexes(ranges)
         substring = ""
 

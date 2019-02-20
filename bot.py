@@ -32,7 +32,7 @@ async def on_message(message):
         msg = MessageContent(message, bot.prefix, exe.cmd_list)
 
         if msg.cmd == "ping":
-            exe.ping(msg, bot, return_msg)
+            exe.ping(pingdtb, msg, return_msg)
         if msg.cmd == "pong":
             exe.pong(return_msg)
         if msg.cmd == "help":
@@ -58,7 +58,9 @@ async def on_message(message):
 
         bot_msg = return_msg.make_answer()
         if (bot_msg != ""):
-            await client.send_message(return_msg.dest, bot_msg)
+            if return_msg.channel == None:
+                return_msg.channel = msg.channel
+            await client.send_message(return_msg.channel, bot_msg)
     else:
         pass
 
@@ -80,7 +82,7 @@ async def on_ready():
     print("logged in as", client.user.name, client.user.id)
     await client.change_presence(game=discord.Game(name="Tourner Laurent en Bourique", type=0))
 
-client.run("NDQ2MzgyMTY0MDQ1NTk0NjI0.D01_-g.XyHuKaRJRurl1kd0gNYSvXOpcEI")
+client.run(os.environ["TOKEN"])
 
 #@todo creer la cmd !joke
 #@todo faire un truc de mathplotlib, save le graphic, importer le graphic sur discord

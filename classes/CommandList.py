@@ -14,31 +14,18 @@ class CommandList:
         return_msg.main += "```"
 
     def ping(self, pingdtb, msg, return_msg):
-        option = msg.finder("o", 1)
-        if option == None:
-            return_msg.main = bot.ping_text[np.random.randint(0,len(bot.ping_text))]
-        else:
-            if option == "a" or option == "add":
-                ping_add(bot, msg, return_msg)
-            elif option == "d" or option == "delete":
-                ping_delete(bot, msg, return_msg)
-            elif option == "l" or option == "list":
-                ping_list(bot, msg, return_msg)
-            else:
-                return_msg.error = "Unknown option '" + option + "' with ping.\n" + \
-                    "Use !help !ping to get some infos"
-                return_msg.channel = msg.author
-
         def ping_add(pingdtb, msg, return_msg):
             if msg.checker("xo", "0,1") == False:
+                print("checker false")
                 return
             if len(msg.finder("s", start="x", keep_prefix=True, positive=False)) == None:
                 return_msg.error = "Cannot create empty message for !ping\n" + \
                     "@here and @everyone are ignored"
                 return_msg.channel = msg.author
             else:
-                content = msg.msg_split[2:].join(" ")
+                content = " ".join(msg.msg_split[2:])
                 while "\n" in content:
+                    print("check")
                     content = content.replace("\n", "\\n")
                 pingdtb.pingdtb.append(content)
                 pingdtb.save_ping_text()
@@ -49,7 +36,7 @@ class CommandList:
                 return
             return_msg.warning = "Command not ready yet. Need to add emote detection"
             return
-            id = msg.finder("i", 1)
+            id = msg.finder("i", 1)[0]
             if id < 1 or id > len(pingdtb.pingdtb):
                 return_msg.error = "id is out of range"
                 return_msg.channel = msg.author
@@ -63,87 +50,28 @@ class CommandList:
             for idx, i in enumerate(pingdtb.pingdtb):
                 while "\\n" in i:
                     i = i.replace("\\n", "\n")
-                return_msg.main += str(idx+1) + ". " + i + "\n"
+                return_msg.main += str(idx+1) + ". " + i
             return_msg.main += "```"
 
-        ping_text = []
-        length = 0
-        with open("ping.txt", 'r') as f:
-            for line in f:
-                if "#" in line:
-                    position = line.index("#")
-                    if (position != -1):
-                        ping_text.append(line[position+2:])
-                        length += 1
-                else:
-                    ping_text[length-1] += line
-
-        if len(msg.options) == 0:
-            if len(ping_text) == 0:
-                return_msg.warning = "There is no message I can use, add message with !ping -a"
-                return
-            return_msg.main = ping_text[np.random.random_integers(0, length-1)]
-            return
-
-        if msg.options[0] == "l":
-            if length == 0:
-                return_msg.warning = "There is no message I can use"
-                return_msg.info = "FEED MEEEEE"
-                return
-            return_msg.priority = "Ping text list :"
-            for index, i in enumerate(ping_text):
-                return_msg.main += str(index) + "# " + i
-
-        elif msg.options[0] == "a":
-            pos = msg.msg_trim.index("-a")
-            res = msg.msg_trim[pos+3:].strip().replace("\n", "\\n")
-            if len(res) == 0:
-                return_msg.error = "Can't add no text"
-                return
-            with open("ping.txt", 'a') as f:
-                f.write(str(length) + "# " + res + "\n")
-            return_msg.main = "Succesfully added \"" + res + "\" as #" + str(length)
-
-        elif msg.options[0] == "d" or msg.options[0] == "r":
-            if len(msg.values) == 0:
-                return_msg.error = "Need a number"
-                return
-            value = msg.values[0]
-            if value >= length or value < 0:
-                return_msg.error = "No text at index " + str(value)
-                return
-            tmp = ping_text[value]
-            del ping_text[value]
-            with open("ping.txt", 'w') as f:
-                for index, i in enumerate(ping_text):
-                    f.write(str(index) + "# " + i)
-            return_msg.main = "\"" + tmp[:-1] + "\" got deleted"
-
-        elif msg.options[0] == "c" or msg.options[0] == "m":
-            if len(msg.values) == 0:
-                return_msg.error = "Need a number"
-                return
-            value = msg.values[0]
-            if value >= length or value < 0:
-                return_msg.error = "No text at index " + str(value)
-                return
-            tmp = ping_text[value]
-            del ping_text[value]
-            with open("ping.txt", 'w') as f:
-                for index, i in enumerate(ping_text):
-                    f.write(str(index) + "# " + i)
-            return_msg.main = "\"" + tmp[:-1] + "\" got deleted"
-            pos = msg.msg_trim.index("-a")
-            res = msg.msg_trim[pos+3:].strip().replace("\n", "\\n")
-            if len(res) == 0:
-                return_msg.error = "Can't add no text"
-                return
-            with open("ping.txt", 'a') as f:
-                f.write(str(length) + "# " + res + "\n")
-            return_msg.main = "Succesfully added \"" + res + "\" as #" + str(length)
-
+        #main of ping
+        if msg.checker("o", 1) == False:
+            ping_text = pingdtb.pingdtb[np.random.randint(0,len(pingdtb.pingdtb))]
+            while "\\n" in ping_text:
+                print("check")
+                ping_text = ping_text.replace("\\n", "\n")
+            return_msg.main = ping_text
         else:
-            return_msg.warning = "This option doesn't exist"
+            option = msg.finder("o", 1)[0]
+            if option == "a" or option == "add":
+                ping_add(pingdtb, msg, return_msg)
+            elif option == "d" or option == "delete":
+                ping_delete(pingdtb, msg, return_msg)
+            elif option == "l" or option == "list":
+                ping_list(pingdtb, msg, return_msg)
+            else:
+                return_msg.error = "Unknown option '" + option + "' with ping.\n" + "Use !help !ping to get some infos"
+                return_msg.channel = msg.author
+
 
     def pong(self, return_msg):
         return_msg.main = "tente un !ping plutot"
