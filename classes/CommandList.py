@@ -46,12 +46,13 @@ class CommandList:
         def ping_list(pingdtb, msg, return_msg):
             if msg.checker("xo", "0,1") == False:
                 return
-            return_msg.main = "```md\n"
+            return_msg.main = "```md\n# Current ping text\n\n"
             for idx, i in enumerate(pingdtb.pingdtb):
                 while "\\n" in i:
                     i = i.replace("\\n", "\n")
-                return_msg.main += str(idx+1) + ". " + i
+                return_msg.main += str(idx+1) + ". " + i + "\n"
             return_msg.main += "```"
+            return_msg.channel = msg.author
 
         #main of ping
         if msg.checker("o", 1) == False:
