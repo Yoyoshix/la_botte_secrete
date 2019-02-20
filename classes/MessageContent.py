@@ -162,7 +162,7 @@ class MessageContent:
             You might get an unexpected result if start=2, stop=1, Trigger=False
                 Like this, stop will not be evaluated and the finder will check elements[2:]
             Very useful when you want to start on a specific index and end on a specific parse_type after the index
-        positive match elements when they have the same value as positive
+        positive will match elements when they have the same value as positive
         reverse on True will reverse the order of the research
 
         by default the finder return all words """
@@ -194,15 +194,18 @@ class MessageContent:
                     target += 1
         return res
 
-    def checker(self, match="xw", ranges=None, in_a_row=True, reverse=False):
+    def checker(self, match="xw", ranges="0,1", in_a_row=True, reverse=False):
         """ return True if parameters does match the parse_type
-        match is the content of the parse_type elements you want to search. Note that you can write www to check 3 words in a row
+        match is the amount of each parse_type elements you want to search.
+            You can write www to check 3 words in a row
+        ranges follow the same syntax as occurences except it targets indexes
+            it means that ranges="0:2,3" will only check index 0,1 and 3 in the parse_type array
         in_a_row on True means that match must be a substring of parse_type.
             - Using False will check if elements in match does appear in parse_type with the order
             - Using None will just check if elements are in parse_type whatever the order is
-        ranges and reverse are the same as above
+        reverse is the same as in finder() above
 
-        by default it returns True if there is a command followed by a word """
+        by default it returns True if there is a command followed by a word at start """
 
         res = []
         length = len(self.parse_type)

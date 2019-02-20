@@ -1,13 +1,17 @@
-from modulefinder import ModuleFinder
-f = ModuleFinder()
 
-# Run the main script
-f.run_script('bot.py')
+class Command():
+    def __init__(self, data):
+        self.data = data
+        print(self.__dict__)
 
-# Get names of all the imported modules
-names = list(f.modules.keys())
+    def func(self, value):
+        print(value)
 
-# Get a sorted list of the root modules imported
-basemods = sorted(set([name.split('.')[0] for name in names]))
-# Print it nicely
-print("\n".join(basemods))
+    def direct(self):
+        def oui(self):
+            print("yeye")
+        print(self.data)
+
+test = Command(10)
+for i in dir(test):
+    print(i, type(i))

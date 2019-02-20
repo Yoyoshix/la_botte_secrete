@@ -8,7 +8,7 @@ class BotSettings:
         self.debug = 0
         self.update()
 
-    def update(self, return_msg=None):
+    def update(self):
         pass
 
         #print(self.ping_text)

@@ -7,11 +7,14 @@ from classes.ReturnMessage import ReturnMessage
 from classes.CommandList import CommandList
 from classes.BotSettings import BotSettings
 from classes.ServerInfo import ServerInfo
+from classes.PingManager import PingDatabase
+from classes.PingManager import PingPending
 
 client = discord.Client() #Initialize bot
 exe = CommandList() #Initialize cmd available
 bot = BotSettings("!") #Initialize bot settings
 serv = ServerInfo(client, discord) #initialize server info
+pingdtb = PingDatabase()
 
 @client.event
 async def on_message(message):
@@ -30,7 +33,7 @@ async def on_message(message):
         msg = MessageContent(message, bot.prefix, exe.cmd_list)
 
         if msg.cmd == "ping":
-            exe.ping(msg, return_msg)
+            exe.ping(msg, bot, return_msg)
         if msg.cmd == "pong":
             exe.pong(return_msg)
         if msg.cmd == "help":
@@ -56,7 +59,7 @@ async def on_message(message):
 
         bot_msg = return_msg.make_answer()
         if (bot_msg != ""):
-            await client.send_message(msg.channel, bot_msg)
+            await client.send_message(return_msg.dest, bot_msg)
     else:
         pass
 

@@ -2,7 +2,7 @@ import numpy as np
 
 class CommandList:
     def __init__(self):
-        self.cmd_list = ["ping", "pong", "help", "test", "update", "option", "rr", "we"] #incomplete
+        self.cmd_list = dir(self)[27:] #yay, it works
 
     def help(self, return_msg):
         return_msg.main = "```Here is all commands with desc and current state"
@@ -13,10 +13,31 @@ class CommandList:
         return_msg.main += "\nrrr\nDesc : To start the real russian roulette\nState : Coming\n"
         return_msg.main += "```"
 
-    def ping_write():
-        pass
+    def ping(self, pingdtb, msg, return_msg):
+        option = msg.finder("o", 1)
+        if len(option) == 0:
+            return_msg.main = bot.ping_text[np.random.randint(0,len(bot.ping_text))]
+        else:
+            if option == "a" or option == "add":
+                ping_add(bot, msg, return_msg)
+            elif option == "d" or option == "delete":
+                ping_delete(bot, msg, return_msg)
+            elif option == "l" or option == "list":
+                ping_list(bot, msg, return_msg)
+            else:
+                return_msg.error = "Unknown option '" + option + "' with ping.\n" \
+                    + "Use !help !ping to get some infos"
+                return_msg.channel = msg.author
 
-    def ping(self, msg, return_msg):
+        def ping_add(bot, msg, return_msg):
+            pass
+
+        def ping_delete(bot, msg, return_msg):
+            pass
+
+        def ping_list(bot, msg, return_msg):
+            pass
+
         ping_text = []
         length = 0
         with open("ping.txt", 'r') as f:
@@ -173,6 +194,8 @@ class CommandList:
             return "role"
         if type == "c":
             return "channel"
+        if type == "s":
+            return "special"
 
     def debug_parse(self, msg, return_msg):
         return_msg.main = "msg is : `" + msg.message + "`\nParse gives (type, content) :\n"
