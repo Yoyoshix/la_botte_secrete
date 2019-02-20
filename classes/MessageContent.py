@@ -186,9 +186,9 @@ class MessageContent:
             if stop != None:
                 if trigger == True or is_capturing == True:
                     if type(stop) == type(0) and (idx == stop):
-                        return res
+                        break
                     if type(stop) == " " and (self.parse_type[idx] in stop):
-                        return res
+                        break
             if is_capturing == True:
                 if (self.parse_type[idx] in match) == positive:
                     if target in index_array:
@@ -196,6 +196,8 @@ class MessageContent:
                             res.append(self.parse_msg[idx][(self.parse_type[idx] in "ox"):])
                         res.append(self.parse_msg[idx])
                     target += 1
+        if len(res) == 0:
+            return None
         return res
 
     def checker(self, match="xw", ranges="0,1", in_a_row=True, reverse=False):

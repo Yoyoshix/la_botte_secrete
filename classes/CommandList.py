@@ -15,7 +15,7 @@ class CommandList:
 
     def ping(self, pingdtb, msg, return_msg):
         option = msg.finder("o", 1)
-        if len(option) == 0:
+        if option == None:
             return_msg.main = bot.ping_text[np.random.randint(0,len(bot.ping_text))]
         else:
             if option == "a" or option == "add":
@@ -30,22 +30,41 @@ class CommandList:
                 return_msg.channel = msg.author
 
         def ping_add(pingdtb, msg, return_msg):
-            if msg.checker("xo", "0,1", True) == False:
+            if msg.checker("xo", "0,1") == False:
                 return
-            content = msg.finder("s", start="x", keep_prefix=True, positive=False)
-            if len(content) == 0:
+            if len(msg.finder("s", start="x", keep_prefix=True, positive=False)) == None:
                 return_msg.error = "Cannot create empty message for !ping\n" + \
                     "@here and @everyone are ignored"
                 return_msg.channel = msg.author
             else:
-                
-            pass
+                content = msg.msg_split[2:].join(" ")
+                while "\n" in content:
+                    content = content.replace("\n", "\\n")
+                pingdtb.pingdtb.append(content)
+                pingdtb.save_ping_text()
+                return_msg.main = "New message added. There is currently " + str(len(pingdtb.pingdtb)) + " different texts"
 
         def ping_delete(pingdtb, msg, return_msg):
-            pass
+            if msg.checker("xoi", "0,1,2") == False:
+                return
+            return_msg.warning = "Command not ready yet. Need to add emote detection"
+            return
+            id = msg.finder("i", 1)
+            if id < 1 or id > len(pingdtb.pingdtb):
+                return_msg.error = "id is out of range"
+                return_msg.channel = msg.author
+            else:
+                pass
 
         def ping_list(pingdtb, msg, return_msg):
-            pass
+            if msg.checker("xo", "0,1") == False:
+                return
+            return_msg.main = "```md\n"
+            for idx, i in enumerate(pingdtb.pingdtb):
+                while "\\n" in i:
+                    i = i.replace("\\n", "\n")
+                return_msg.main += str(idx+1) + ". " + i + "\n"
+            return_msg.main += "```"
 
         ping_text = []
         length = 0
