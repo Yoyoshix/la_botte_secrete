@@ -36,7 +36,7 @@ async def on_message(message):
         if msg.cmd == "pong":
             exe.pong(return_msg)
         if msg.cmd == "help":
-            exe.help(return_msg)
+            exe.help(msg, return_msg)
         if msg.cmd == "test":
             exe.test(discord, msg, client, bot, serv, return_msg)
         if msg.cmd == "update":

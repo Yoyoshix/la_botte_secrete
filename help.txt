@@ -1,0 +1,23 @@
+```md
+# COMMAND LIST
+
+<>
+
+1. <ping> [WORKING](Print a random text. Users are able to change the printed text) <
+-a(dd) <text> > Add a new text to the database <
+-d(elete) <id> > Delete an existing text in the database [NOT IMPLEMENTED YET] <
+-l(ist) [id] > List current ping text in database <
+
+<>
+
+2. <pong> [WORKING](xd lol) <
+
+<>
+
+3. <help> [WORKING](Display the list of commands you can use with some infos) <
+<help> <cmd> > Print a more helpful description about a specific command [NOT IMPLEMENTED YET]
+
+<>
+
+More comming...
+```

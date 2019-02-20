@@ -4,14 +4,10 @@ class CommandList:
     def __init__(self):
         self.cmd_list = dir(self)[27:] #yay, it works
 
-    def help(self, return_msg):
-        return_msg.main = "```Here is all commands with desc and current state"
-        return_msg.main += "\nping [-a|-d|-l]\nDesc : Dislay a random msg\nOptions : -a to add a line. -d to delete a line. -l to get the current list\nState : Not working\n"
-        return_msg.main += "\npong\nDesc : lol\n"
-        return_msg.main += "\nsay\nDesc : If you want the bot say something\nState : Some issues with whole msg\n"
-        return_msg.main += "\nrr\nDesc : To start the russian roulette\nState : Coming\n"
-        return_msg.main += "\nrrr\nDesc : To start the real russian roulette\nState : Coming\n"
-        return_msg.main += "```"
+    def help(self, msg, return_msg):
+        with open("help.txt", "r") as file:
+            return_msg.main = file.read()
+        return_msg.channel = msg.author
 
     def ping(self, pingdtb, msg, return_msg):
         def ping_add(pingdtb, msg, return_msg):
