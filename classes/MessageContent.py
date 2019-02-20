@@ -58,13 +58,12 @@ class MessageContent:
     def parse_command(self, cmd, cmd_list):
         if cmd in cmd_list:
             self.parse_type += "x"
-            self.parse_msg.append(cmd[1:])
         else:
             self.parse_type += "w"
-            self.parse_msg.append(cmd)
+        self.parse_msg.append(cmd)
 
     #parse the option at the same time
-    def parse_number(self, value, parse_type, offset=0):
+    def parse_number(self, value, parse_type):
         try:
             res = int(value)
             parse_type = "i"
@@ -73,7 +72,7 @@ class MessageContent:
                 res = float(value)
                 parse_type = "f"
             except ValueError as e:
-                res = value[offset:]
+                res = value
         self.parse_type += parse_type
         self.parse_msg.append(res)
 
@@ -123,7 +122,7 @@ class MessageContent:
             elif i[0] == prefix:
                 self.parse_command(i, cmd_list)
             elif i[0] == "-":
-                self.parse_number(i, "o", 1)
+                self.parse_number(i, "o")
             elif i[0] == "<" and len(i) > 3:
                 self.parse_mention(i)
             else:
@@ -146,17 +145,17 @@ class MessageContent:
                         index_array.append(j-offset)
         return index_array
 
-    def finder(self, match="w", occurences=None, start=None, stop=None, trigger=True, positive=True, reverse=False):
+    def finder(self, match="w", occurences=None, start=None, stop=None, trigger=True, positive=True, reverse=False, keep_prefix=False):
         """ return elements in the message with given parameters
         match is the type of elements you want to get (check the parse_type variable to see possibilities)
+            using ! at start of match will reverse the value of positive
         occurences will create the nth indexes elements to capture
             -None will find everything
             -use ':' to make a range of capture, be careful as it is inclusive
             -use ',' to add another capture in the list
             -exemple : 1:3,5 will match the first, second, third and fifth occurence
-        start and stop will respectively start and stop the finder on the first occurence of one of their parse_type
+        start and stop will respectively start and stop the finder on the first value they are intended to be trigger
             you can give them a number as an index OR gives them a range of parse_type
-            None will not trigger them
             stop is exclusive. It means that if start=stop nothing will be returned
         trigger on False will check stop only once start has been triggered. True will not
             You might get an unexpected result if start=2, stop=1, Trigger=False
@@ -164,6 +163,7 @@ class MessageContent:
             Very useful when you want to start on a specific index and end on a specific parse_type after the index
         positive will match elements when they have the same value as positive
         reverse on True will reverse the order of the research
+        keep_prefix on True will keep the "-" for options as well as the cmd prefix when the content will be returned
 
         by default the finder return all words """
 
@@ -174,6 +174,8 @@ class MessageContent:
         target = 0
         if match == None:
             match = "xwoifmrcs"
+        if len(match) > 0 and match[0] == "!":
+            positive = !positive
 
         for idx in range(length*reverse-reverse, length*(-reverse+1)-reverse, (-reverse)*2+1): #xd lol
             if is_capturing == False:
@@ -190,6 +192,8 @@ class MessageContent:
             if is_capturing == True:
                 if (self.parse_type[idx] in match) == positive:
                     if target in index_array:
+                        if keep_prefix == False:
+                            res.append(self.parse_msg[idx][(self.parse_type[idx] in "ox"):])
                         res.append(self.parse_msg[idx])
                     target += 1
         return res

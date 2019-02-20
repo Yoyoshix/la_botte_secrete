@@ -4,17 +4,16 @@ import random
 
 from classes.MessageContent import MessageContent
 from classes.ReturnMessage import ReturnMessage
+from classes.PingDatabase import PingDatabase
 from classes.CommandList import CommandList
 from classes.BotSettings import BotSettings
 from classes.ServerInfo import ServerInfo
-from classes.PingManager import PingDatabase
-from classes.PingManager import PingPending
 
-client = discord.Client() #Initialize bot
+client = discord.Client() #Initialize client
 exe = CommandList() #Initialize cmd available
-bot = BotSettings("!") #Initialize bot settings
-serv = ServerInfo(client, discord) #initialize server info
-pingdtb = PingDatabase()
+bot = BotSettings("!") #Initialize bot settings and his parameters
+serv = ServerInfo(client, discord) #Initialize Server info/data
+pingdtb = PingDatabase() #Load and manage data for the !ping cmd
 
 @client.event
 async def on_message(message):

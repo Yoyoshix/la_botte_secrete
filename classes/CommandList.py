@@ -25,17 +25,26 @@ class CommandList:
             elif option == "l" or option == "list":
                 ping_list(bot, msg, return_msg)
             else:
-                return_msg.error = "Unknown option '" + option + "' with ping.\n" \
-                    + "Use !help !ping to get some infos"
+                return_msg.error = "Unknown option '" + option + "' with ping.\n" + \
+                    "Use !help !ping to get some infos"
                 return_msg.channel = msg.author
 
-        def ping_add(bot, msg, return_msg):
+        def ping_add(pingdtb, msg, return_msg):
+            if msg.checker("xo", "0,1", True) == False:
+                return
+            content = msg.finder("s", start="x", keep_prefix=True, positive=False)
+            if len(content) == 0:
+                return_msg.error = "Cannot create empty message for !ping\n" + \
+                    "@here and @everyone are ignored"
+                return_msg.channel = msg.author
+            else:
+                
             pass
 
-        def ping_delete(bot, msg, return_msg):
+        def ping_delete(pingdtb, msg, return_msg):
             pass
 
-        def ping_list(bot, msg, return_msg):
+        def ping_list(pingdtb, msg, return_msg):
             pass
 
         ping_text = []
